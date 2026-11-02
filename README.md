@@ -1,44 +1,35 @@
 # PrestaShop Cleaner
 
-**This module has been archived, it’s no longer maintained but you still can fork it if you need it for your shop.**
+Módulo complementario no oficial. El módulo oficial de PrestaShop está archivado y ya no se mantiene. Esta versión sigue el mismo módulo para poder usarlo en PrestaShop 8 y 9, incluida la 9.2, y en PHP 8.4, sin dejar de funcionar en tiendas anteriores.
 
-## About
+- Módulo oficial (archivado): https://github.com/prestashop/pscleaner
+- Módulo actualizado: https://github.com/cloyola/pscleaner
 
-PrestaShop helps you remove your catalog, orders and customers data in one go.
+## Qué hace
 
-## Multistore compatibility
+Permite, desde el back office, revisar y corregir datos huérfanos, limpiar la base de datos y vaciar el catálogo o los pedidos y clientes. No hay vuelta atrás después de vaciar datos.
 
-This module is not compatible with the multistore :x: <br/>
-It means that its configuration applies for all stores.<br/>
+## Compatibilidad
 
-## Contributing
+- PrestaShop 1.7.1.0 a 9.x (incluida la 9.2)
+- PHP 7.1 a 8.4
+- No es compatible con multitienda: la acción afecta a todas las tiendas
 
-PrestaShop modules are open-source extensions to the PrestaShop e-commerce solution. Everyone is welcome and even encouraged to contribute with their own improvements.
+## Cambios en 2.2.0
 
-### Requirements
+- El módulo carga en una instalación nueva de PrestaShop 9. La guarda usa `_PS_VERSION_` en lugar de `_CAN_LOAD_FILES_`, que ya no existe.
+- `Tools::encrypt()` se sustituye por `Tools::hash()`, porque el método antiguo se eliminó en PrestaShop 9.
+- Las consultas comprueban que la tabla y la columna existan. Si una versión no las tiene, se omiten y el proceso continúa.
+- Se tienen en cuenta tablas que desaparecieron en PrestaShop 8 (`attribute_impact`, `referrer_cache`) y tablas nuevas de PrestaShop 9 (`shipment`, `shipment_product`, `customer_session`, `product_attribute_lang` y las relaciones B2B del cliente).
+- Las imágenes de producto, categoría, fabricante y proveedor se borran también en png, webp y avif. En PrestaShop 9 se usa `_PS_PRODUCT_IMG_DIR_`.
+- El stock compartido (`id_shop = 0`) ya no se borra como si fuera un dato huérfano.
+- La configuración del módulo muestra el aviso de módulo no oficial.
 
-Contributors **must** follow the following rules:
+La actualización desde la 2.1.0 no modifica la base de datos. El script `upgrade/upgrade-2.2.0.php` solo marca la versión nueva.
 
-* **Make your Pull Request on the "dev" branch**, NOT the "master" branch.
-* Do not update the module's version number.
-* Follow [the coding standards][1].
+## Cómo actualizar una tienda que ya lo tiene instalado
 
-### Process in details
+1. Sustituye la carpeta `modules/pscleaner` por esta versión.
+2. En el back office, entra en Módulos y actualiza PrestaShop Cleaner.
 
-Contributors wishing to edit a module's files should follow the following process:
-
-1. Create your GitHub account, if you do not have one already.
-2. Fork the pscleaner project to your GitHub account.
-3. Clone your fork to your local machine in the ```/modules``` directory of your PrestaShop installation.
-4. Create a branch in your local clone of the module for your changes.
-5. Change the files in your branch. Be sure to follow [the coding standards][1]!
-6. Push your changed branch to your fork in your GitHub account.
-7. Create a pull request for your changes **on the _'dev'_ branch** of the module's project. Be sure to follow [the commit message norm][2] in your pull request. If you need help to make a pull request, read the [Github help page about creating pull requests][3].
-8. Wait for one of the core developers either to include your change in the codebase, or to comment on possible improvements you should make to your code.
-
-That's it: you have contributed to this open-source project! Congratulations!
-
-[1]: http://doc.prestashop.com/display/PS16/Coding+Standards
-[2]: http://doc.prestashop.com/display/PS16/How+to+write+a+commit+message
-[3]: https://help.github.com/articles/using-pull-requests
-
+PrestaShop ejecutará `upgrade/upgrade-2.2.0.php` y dejará la versión instalada en 2.2.0.

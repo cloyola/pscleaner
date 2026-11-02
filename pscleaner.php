@@ -62,7 +62,9 @@ class PSCleaner extends Module
 
     public function getContent()
     {
-        $html = '<h2>'.$this->trans('Be really careful with this tool - There is no possible rollback!', array(), 'Modules.Pscleaner.Admin').'</h2>';
+        $this->registerConfigureAssets();
+        $html = $this->renderUnofficialNotice();
+        $html .= '<h2>'.$this->trans('Be really careful with this tool - There is no possible rollback!', array(), 'Modules.Pscleaner.Admin').'</h2>';
         if (Tools::isSubmit('submitCheckAndFix')) {
             $logs = self::checkAndFix();
             if (count($logs)) {
@@ -121,6 +123,32 @@ class PSCleaner extends Module
 		</script>';
 
         return $html.$this->renderForm();
+    }
+
+    protected function registerConfigureAssets()
+    {
+        if (isset($this->context->controller) && is_object($this->context->controller) && method_exists($this->context->controller, 'addCSS')) {
+            $this->context->controller->addCSS($this->_path.'views/css/configure.css');
+        }
+    }
+
+    protected function renderUnofficialNotice()
+    {
+        $template = $this->local_path.'views/templates/admin/configure.tpl';
+        if (isset($this->context->smarty) && is_object($this->context->smarty) && is_file($template)) {
+            return $this->context->smarty->fetch($template);
+        }
+
+        $officialUrl = 'https://github.com/prestashop/pscleaner';
+        $updatedUrl = 'https://github.com/cloyola/pscleaner';
+
+        return '<div class="alert alert-warning pscleaner-unofficial-notice">'
+            .'<h4>'.$this->l('Unofficial complementary module', 'configure').'</h4>'
+            .'<p>'.$this->l('This is an unofficial complementary PrestaShop module. It was adapted so it can keep being used on PrestaShop 8 and 9.', 'configure').'</p>'
+            .'<ul class="pscleaner-unofficial-links">'
+            .'<li>'.$this->l('Official module (archived)', 'configure').': <a href="'.$officialUrl.'" target="_blank" rel="noopener noreferrer">'.$officialUrl.'</a></li>'
+            .'<li>'.$this->l('Updated module', 'configure').': <a href="'.$updatedUrl.'" target="_blank" rel="noopener noreferrer">'.$updatedUrl.'</a></li>'
+            .'</ul></div>';
     }
 
     public static function checkAndFix()
